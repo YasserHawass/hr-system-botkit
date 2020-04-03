@@ -5,20 +5,5 @@ module.exports = function(controller) {
     await bot.reply(message, 'Hello human')
     });
 
-    controller.hears('menu', 'message,direct_message', async(bot, message) => { 
-
-        await bot.reply(message, {
-            text: 'Here is a menu!',
-            quick_replies: [
-                {
-                    title: "Main",
-                    payload: "main-menu",
-                },
-                {
-                    title: "Help",
-                    payload: "help"
-                }
-            ]
-        });
-    });
+    
 }

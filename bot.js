@@ -7,7 +7,6 @@
 // Import Botkit's core features
 const { Botkit } = require('botkit');
 const { BotkitCMSHelper } = require('botkit-plugin-cms');
-
 // Import a platform-specific adapter for web.
 
 const { WebAdapter } = require('botbuilder-adapter-web');
@@ -32,10 +31,8 @@ const adapter = new WebAdapter({});
 
 const controller = new Botkit({
     webhook_uri: '/api/messages',
-
     adapter: adapter,
-
-    storage
+    storage: storage
 });
 
 if (process.env.CMS_URI) {
