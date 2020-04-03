@@ -21,6 +21,8 @@ let storage = null;
 if (process.env.MONGO_URI) {
     storage = mongoStorage = new MongoDbStorage({
         url : process.env.MONGO_URI,
+        database: process.env.MONGO_DB,
+        collection:process.env.MONGO_CLCT
     });
 }
 
