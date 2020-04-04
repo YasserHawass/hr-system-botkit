@@ -1,7 +1,6 @@
 
 
 module.exports = function(controller) {
-    /*
     const { BotkitConversation } = require('botkit'); //don't remove from here Yaser
 
     // please put only dialogues here
@@ -19,50 +18,57 @@ module.exports = function(controller) {
     // collect a value with conditional actions
     ConAbsLeaving.ask('What is the leave type?\n1- normal leave\n2- emergency leave\n3-sick leave\n4- other', [
         {
-            pattern: '[1normal]{1,7}',
+            pattern: '1',
             handler: async function(answer, convo, bot) {
-                await convo.gotoThread('likes_tacos');
+                await convo.gotoThread('recieved');
             }
         },
         {
-            pattern: '[2emergency]{1,7}',
+            pattern: '2',
             handler: async function(answer, convo, bot) {
-                await convo.gotoThread('likes_tacos');
+                await convo.gotoThread('recieved');
             }
         },
         {
-            pattern: '[3sick]{1,7}',
+            pattern: '3',
             handler: async function(answer, convo, bot) {
-                await convo.gotoThread('likes_tacos');
+                await convo.gotoThread('recieved');
             }
         },
         {
-            pattern: '[4other]{1,7}',
+            pattern: '4',
             handler: async function(answer, convo, bot) {
                 convo.setVar('reason', '4');
             }
         },
         {
             default: true,
-            handler: async(response_text, convo, bot, full_message) => {
+            handler: async(answer, convo, bot, full_message) => {
                 await bot.say('I do not understand your response!');
                 return await convo.repeat();
             }
         }
     ],{key: 'reason'});
-    ConAbsLeaving.ask("please state it", async(res, convo, bot) => {}, {key: 'reasonx'});
+    ConAbsLeaving.ask("please state it", async(answer, convo, bot) => {
+        // leaving it empty, gave me stall status, which needed Ctrl + C to solve it.
+        await convo.gotoThread('recieved');
+    }, {key: 'reasonx'});
 
     // define a 'likes_tacos' thread
-    ConAbsLeaving.addMessage('HOORAY TACOS', 'likes_tacos');
+    ConAbsLeaving.addMessage('roger!', 'recieved');
 
     // if (convo.vars != '4'){
     //     convo.ask('what is the reason?', [],'reasonx');
     // }
-
+    
     // handle the end of the conversation
     ConAbsLeaving.after(async(results, bot) => {
         const name = results.name;
-        console.log(results);
+        const reason = results.reasonx || results.reason;
+        // const reasonx = reslts.reasonx;
+        // it refused to summarize it reasonx into reason, in one line so gotta use this format
+        // console.log(results);
+        // console.log(reason);
     });
     // Add the dialog to the bot
     controller.addDialog(ConAbsLeaving);
@@ -86,7 +92,7 @@ module.exports = function(controller) {
         });
     });
 
-    controller.hears('[help]{4}', 'message,direct_message', async(bot, message) => { 
+    controller.interrupts('help', 'message,direct_message', async(bot, message) => { 
         await bot.reply(message, {
             text: 'here\'s available commands',
             quick_replies: [
@@ -111,5 +117,4 @@ module.exports = function(controller) {
         // Different dialog ids depends on the siutation, if condition here!
         await bot.beginDialog(ABS_DIALOG_ID);
     });
-    */
 }
