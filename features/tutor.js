@@ -1,13 +1,14 @@
 module.exports = function(controller) {
     const { Botkit, BotkitConversation } = require('botkit');
+
+    // DIALOG DECLRATION
     const MY_DIALOG_ID = 'my-dialog-name-constant';
     let convo = new BotkitConversation(MY_DIALOG_ID, controller);
+    convo.say('Hello!');
+    convo.say('Welcome to the world of bots!');
+    controller.addDialog(convo);
+
     
-    module.exports = function(controller) {
-        controller.hears('create_dialog_service', 'message', async(bot, message) => {
-            await bot.beginDialog(MY_DIALOG_ID);
-        });
-    }
 
 
     // HEARS
@@ -30,6 +31,14 @@ module.exports = function(controller) {
     controller.hears('hello','message',async(bot, message) => {
         await bot.reply(message, 'Hello back at you, '+global.name);
     });
+
+    
+    // HEARS - DIALOG
+    controller.hears('creata', 'message', async(bot, message) => {
+        await bot.beginDialog(MY_DIALOG_ID);
+    });
+
+   
 
 
     //INTTERUPTS
