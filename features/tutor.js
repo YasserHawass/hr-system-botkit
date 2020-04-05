@@ -50,18 +50,18 @@ module.exports = function(controller) {
     }, {key: 'reasonx'});
 
     convo.addMessage('roger!', 'recieved'); // define a 'recieved' thread
-    // convo.ask('What is the start date of your vacation?', async(answer) => { //todo Handle with valdiation 
-    // }, {key: 'start_date'});
-    // convo.ask('What is the end date of your vacation?', async(answer) => { //todo Handle with valdiation & db call
-    // }, {key: 'end_date'});
-    // convo.ask('what is the alt emp name/id?', async(answer) => { //todo Handle with valdiation & db call
-    // }, {key: 'end_date'});
+    convo.addQuestion('What is the start date of your vacation?', async(answer, convo, bot) => {    //  todo Handle with valdiation 
+    }, {key: 'start_date'}, 'recieved');
+    convo.addQuestion('What is the end date of your vacation?', async(answer, convo, bot) => {  // async(answer) => todo Handle with valdiation & db call
+    }, {key: 'end_date'}, 'recieved');
+    convo.addQuestion('what is the alt emp name/id?', async(answer, convo, bot) => {    // async(answer) => todo Handle with valdiation & db call
+    }, {key: 'end_date'}, 'recieved');
 
 
     convo.after(async(results, bot) => {        // handle the end of the conversation
         const name = results.name;
         const reason = results.reasonx || results.reason;
-        // console.log(results);    //todo debuggin
+        console.log(results);    //todo debuggin
     });
     controller.addDialog(convo);
 
