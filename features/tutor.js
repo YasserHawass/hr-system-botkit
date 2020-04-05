@@ -32,7 +32,7 @@ module.exports = function(controller) {
         {
             pattern: '4',
             handler: async function(answer, convo, bot) {
-                convo.setVar('reason', '4');
+                convo.setVar('reason', '4'); //todo kinda no need for it, might skip it, and for the if condition for it?
             }
         },
         {
@@ -50,10 +50,18 @@ module.exports = function(controller) {
     }, {key: 'reasonx'});
 
     convo.addMessage('roger!', 'recieved'); // define a 'recieved' thread
+    // convo.ask('What is the start date of your vacation?', async(answer) => { //todo Handle with valdiation 
+    // }, {key: 'start_date'});
+    // convo.ask('What is the end date of your vacation?', async(answer) => { //todo Handle with valdiation & db call
+    // }, {key: 'end_date'});
+    // convo.ask('what is the alt emp name/id?', async(answer) => { //todo Handle with valdiation & db call
+    // }, {key: 'end_date'});
+
 
     convo.after(async(results, bot) => {        // handle the end of the conversation
         const name = results.name;
         const reason = results.reasonx || results.reason;
+        // console.log(results);    //todo debuggin
     });
     controller.addDialog(convo);
 
@@ -83,6 +91,11 @@ module.exports = function(controller) {
 
     // HEARS - DIALOG
     controller.hears('creata', 'message', async(bot, message) => {
+        await bot.beginDialog(MY_DIALOG_ID);
+    });
+
+    controller.hears('request-leave', 'message,direct_message', async(bot, message) => {
+        // Different dialog ids depends on the siutation, if condition here!
         await bot.beginDialog(MY_DIALOG_ID);
     });
 
