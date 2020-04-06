@@ -6,15 +6,66 @@ function validateDate(date) {
 module.exports = function(controller) {
     const { Botkit, BotkitConversation } = require('botkit');
 
+
     var dumpInfo = {
-        remaning_days:5
+        remaning_days:5,
+        office_number:59
     };
+
+    var mysql = require('mysql');
+    var con = mysql.createConnection({
+        host: '127.0.0.1',
+        user: 'root',
+        password: '',
+        database: 'hr_bot_db'
+    });
+    
+    let checkRemainingDays = async() => {
+        const myQuery = `SELECT \`remaining_days\` FROM \`employee\` WHERE \`office_number\` = ${dumpInfo.office_number}`
+        let result = await new Promise((resolve, reject) => con.query(myQuery, (err, result) => { // change the {} to phonenumber later todo
+            if (err) {
+                reject(err)
+            } else {
+                console.log(result[0].remaining_days);
+                con.end();
+                // return (result[0].remaining_days);
+                resolve(result[0].remaining_days);
+            }
+        }));
+        console.log("query ready");
+        return result;
+    }
+
+    let foo = async () => {
+        const myQuery = "SELECT * FROM my_table";
+    
+        // getting the result of the query
+        let results = await new Promise((resolve, reject) => connection.query(myQuery, (err, results) => {
+          if (err) {
+            reject(err)
+          } else {
+            resolve(results);
+          }
+        }));
+        console.log("query ready");
+        // call bar and waiting the result
+        let res = await bar(results);
+        console.log("bar done");
+        // return resolved promise
+        return res;
+    }
+    
+    let bar = (results) => {   
+        console.log("inside bar");
+        // just return a promise, we don't need the result here
+        return ThirdPartyAPI(result);
+    }
 
     // DIALOG DECLRATION
     const MY_DIALOG_ID = 'my-dialog-name-constant';
     let convo = new BotkitConversation(MY_DIALOG_ID, controller);
     convo.say('Hello!');
-    convo.say('Welcome to the world of bots!');
+    convo.say('Welcome to the world of bots HR System!');
     convo.ask('What is your name?', async(answer) => { 
         // do nothing.
     }, {key: 'name'});
@@ -109,17 +160,21 @@ module.exports = function(controller) {
         let PermittedDate = new Date(convo.vars.start_date);
         GivenDate = new Date(GivenDate);
         // message the DB and substract remaning days is +?
-        let remaning_days = dumpInfo.remaning_days;
+        let remaning_days = await checkRemainingDays();
+        // let remaning_days = await new Promise((resolve, reject) => checkRemainingDays());
+        // let remaning_days = await checkRemainingDays();
+        console.log(`hello ${remaning_days}`);
         PermittedDate.setDate(PermittedDate.getDate() + remaning_days);
         
         if (GivenDate > CurrentDate && PermittedDate >= GivenDate ) { // todo message the DB and subtract days // year first conditions looks wierd but cuz of datemodule?
             var Difference_In_Time = PermittedDate.getTime() - GivenDate.getTime(); 
             var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24)+1; //weird check it later todo
-            dumpInfo.remaning_days -= Difference_In_Days;
-            console.log(Difference_In_Days+""+dumpInfo.remaning_days);
+            dumpInfo.remaning_days -= Difference_In_Days; //update the DB todo
+            // console.log(Difference_In_Days+""+dumpInfo.remaning_days);
             return await convo.gotoThread('t_alt_emp'); //is that even Necessary todo // nope reverse it later
         }else{
             console.log("your vacation starts before it begins?"); //todo debugging
+            console.log(`hello2 ${remaning_days}`);
             return await convo.gotoThread('t_end_date');
         }
     });
