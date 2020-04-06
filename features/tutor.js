@@ -26,7 +26,6 @@ module.exports = function(controller) {
             if (err) {
                 reject(err)
             } else {
-                con.end();
                 resolve(result[0].remaining_days);
             }
         }));
