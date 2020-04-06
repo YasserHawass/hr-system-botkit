@@ -1,8 +1,14 @@
 function validateDate(date) {
     console.log(date);
 }
+
+
 module.exports = function(controller) {
     const { Botkit, BotkitConversation } = require('botkit');
+
+    var dumpInfo = {
+        remaning_days:5
+    };
 
     // DIALOG DECLRATION
     const MY_DIALOG_ID = 'my-dialog-name-constant';
@@ -76,7 +82,8 @@ module.exports = function(controller) {
             return await convo.gotoThread('t_end_date');
         }else{
             console.log("lol that was before dude"); //todo debugging
-            return await convo.repeat();
+            return await convo.gotoThread('t_start_date');
+            // return await convo.repeat();
         }
     });
 
@@ -95,6 +102,27 @@ module.exports = function(controller) {
             }
         }
     ], {key: 'end_date'}, 't_end_date');
+
+    convo.before('t_alt_emp', async(convo, bot) => { // abstract it into a func instead of copy-ing pasting it
+        GivenDate = convo.vars.end_date;
+        var CurrentDate = new Date(convo.vars.start_date);
+        let PermittedDate = new Date(convo.vars.start_date);
+        GivenDate = new Date(GivenDate);
+        // message the DB and substract remaning days is +?
+        let remaning_days = dumpInfo.remaning_days;
+        PermittedDate.setDate(PermittedDate.getDate() + remaning_days);
+        
+        if (GivenDate > CurrentDate && PermittedDate >= GivenDate ) { // todo message the DB and subtract days // year first conditions looks wierd but cuz of datemodule?
+            var Difference_In_Time = PermittedDate.getTime() - GivenDate.getTime(); 
+            var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24)+1; //weird check it later todo
+            dumpInfo.remaning_days -= Difference_In_Days;
+            console.log(Difference_In_Days+""+dumpInfo.remaning_days);
+            return await convo.gotoThread('t_alt_emp'); //is that even Necessary todo // nope reverse it later
+        }else{
+            console.log("your vacation starts before it begins?"); //todo debugging
+            return await convo.gotoThread('t_end_date');
+        }
+    });
 
     convo.addQuestion('what is the alt emp name/id?', async(answer, convo, bot) => {    // todo Handle with valdiation & db call
     }, {key: 'alt_emp_pinfo'}, 't_alt_emp');
