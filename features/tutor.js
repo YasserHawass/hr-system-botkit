@@ -42,6 +42,29 @@ module.exports = function(controller) {
                 // console.log(`query ready xxxx ${fields.values()} ${result[0].office_number}${result[0].name}`); // todo later
                 // console.log(`query ready xxxx  ${result[0].values()}`); // todo later
                 try {   // please remove this todo
+                    console.log(result);
+                    resolve([result[0].name, result[0].office_number]);
+                } catch (error) {
+                    // ​​    return fallback;
+                    resolve(null);
+                } 
+            }
+        }));
+        // console.log(result);
+        return result;
+    }
+
+    let checkEmpName = async(alt_emp_info) => {
+        const myQuery = `SELECT \`name\`, \`office_number\` FROM \`employee\` WHERE \`name\` = '${alt_emp_info}'`
+        let result = await new Promise((resolve, reject) => con.query(myQuery, (err, result, fields) => { // change the {} to phonenumber later todo
+            if (err) {
+                reject(err)
+            } else {
+                console.log(result);
+                // console.log(`query ready xxxx ${fields.values()} ${result[0].office_number}${result[0].name}`); // todo later
+                // console.log(`query ready xxxx  ${result[0].values()}`); // todo later
+                try {   // please remove this todo
+                    // map it into two parts names and numbers and then loop them.
                     resolve([result[0].name, result[0].office_number]);
                 } catch (error) {
                     // ​​    return fallback;
@@ -175,13 +198,13 @@ module.exports = function(controller) {
                 return await convo.gotoThread('t_alt_confirmation');
             }
         },
-        // {
-        //     pattern: new RegExp(/(\w+\s\w+\s\w+)|(\w+\s\w+)/), 
-        //     handler: async function(answer, convo, bot) {
-        //         console.log("good number, okay!");// todo check the db here when done go to next if not repeat please.
-        //         await convo.gotoThread('t_confirmation');
-        //     }
-        // },
+        {
+            pattern: new RegExp(/(\w+\s\w+\s\w+)|(\w+\s\w+)/), 
+            handler: async function(answer, convo, bot) {
+                console.log("good number, okay!");// todo check the db here when done go to next if not repeat please.
+                await convo.gotoThread('t_dups_confirmation');
+            }
+        },
         {
             default: true,
             handler: async(answer, convo, bot, full_message) => {
@@ -190,6 +213,44 @@ module.exports = function(controller) {
         }
         // todo Handle with valdiation & db call
     ], {key: 'alt_emp_info'}, 't_alt_emp');
+
+    convo.before('t_dups_confirmation', async(convo, bot) => {
+        let alt_emp_name = convo.vars.alt_emp_info;
+        let alt_emp_info = await checkEmpName(alt_emp_name);
+        if (alt_emp_info == null){ // in case non
+            return await convo.gotoThread('t_alt_emp');
+        }
+        // need in case only one // and then pass if there's multi's maybe try and catch it if it has more than 1 either go to confirmation or to the dups confirmation
+        console.log(alt_emp_info);
+        let alt_emp_info_name = alt_emp_info[0];
+        let alt_emp_info_number = alt_emp_info[1];
+        console.log(`it's ${alt_emp_info_name} ${alt_emp_info_number}`);
+    });
+
+    convo.addQuestion('omg there\'s many dups', [    // todo Handle with valdiation & db call
+        {
+            pattern: 'yes',
+            type: 'string',
+            handler: async(response_text, convo, bot, full_message) => {
+                // return await convo.gotoThread('yes_taco');
+            }
+        },
+        {
+            pattern: 'no',
+            type: 'string',
+            handler: async(response_text, convo, bot, full_message) => {
+                // return await convo.gotoThread('no_taco');
+            }
+        },
+        {
+            default: true,
+            handler: async(response_text, convo, bot, full_message) => {
+                console.log("repeat confirmation w/ y or n");
+                 // start over!
+                 return await convo.repeat();
+            }
+        }
+    ], {key: 'alt_employee_name_confirmation'}, 't_dups_confirmation');
 
     convo.before('t_alt_confirmation', async(convo, bot) => {
         let alt_emp_number = convo.vars.alt_emp_info;
