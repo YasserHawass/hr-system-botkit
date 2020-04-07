@@ -227,7 +227,7 @@ module.exports = function(controller) {
         console.log(`it's ${alt_emp_info_name} ${alt_emp_info_number}`);
     });
 
-    convo.addQuestion('omg there\'s many dups', [    // todo Handle with valdiation & db call
+    convo.addQuestion('omg there\'s many dups, type yes to submit', [    // todo Handle with valdiation & db call
         {
             pattern: 'yes',
             type: 'string',
@@ -239,7 +239,7 @@ module.exports = function(controller) {
             pattern: 'no',
             type: 'string',
             handler: async(response_text, convo, bot, full_message) => {
-                // return await convo.gotoThread('no_taco');
+                return await convo.gotoThread('t_alt_emp');
             }
         },
         {
